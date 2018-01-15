@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1"></meta>
+<title>Insert title here</title>
+<style type="text/css">
+.ui-menu .ui-menu-item {
+	margin: 0;
+	padding: 0;
+	width: 100%
+}
+
+.ui-menu .ui-menu-divider {
+	margin: 5px -2px 5px -2px;
+	height: 0;
+	font-size: 0;
+	line-height: 0;
+	border-width: 1px 0 0 0
+}
+
+.ui-menu .ui-menu-item a {
+	text-decoration: none;
+	display: block;
+	padding: 2px .4em;
+	line-height: 1.5;
+	min-height: 0;
+	font-weight: normal
+}
+
+.ui-menu .ui-menu-item a.ui-state-focus, .ui-menu .ui-menu-item a.ui-state-active
+	{
+	font-weight: normal;
+	margin: -1px
+}
+
+.ui-menu .ui-state-disabled {
+	font-weight: normal;
+	margin: .4em 0 .2em;
+	line-height: 1.5
+}
+
+.ui-menu .ui-state-disabled a {
+	cursor: default
+}
+
+.ui-menu-icons {
+	position: relative
+}
+
+.ui-menu-icons .ui-menu-item a {
+	position: relative;
+	padding-left: 2em
+}
+
+.ui-menu .ui-icon {
+	position: absolute;
+	top: .2em;
+	left: .2em
+}
+
+.ui-menu .ui-menu-icon {
+	position: static;
+	float: right
+}
+
+.ui-selectable-helper {
+	position: absolute;
+	z-index: 100;
+	border: 1px dotted black
+}
+
+.ui-widget select, .ui-widget textarea, .ui-widget button {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 1em
+}
+
+.ui-widget-content {
+	border: 1px solid #aaa;
+	background: #fff 50% 50% repeat-x;
+	color: #222
+}
+
+.ui-widget-content a {
+	color: #222
+}
+
+.ui-widget-header {
+	border: 1px solid #aaa;
+	background: #ccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png)
+		50% 50% repeat-x;
+	color: #222;
+	font-weight: bold
+}
+
+.ui-widget-header a {
+	color: #222
+}
+
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover,
+	.ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus
+	{
+	border: 1px solid #999;
+	font-weight: normal;
+	color: #212121
+}
+
+.ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active
+	{
+	border: 1px solid #aaa;
+	background: #fff url(images/ui-bg_glass_65_ffffff_1x400.png) 50% 50%
+		repeat-x;
+	font-weight: normal;
+	color: #212121
+}
+</style>
+<link
+	href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+	rel="stylesheet"></link>
+</head>
+<body>
+<div>
+	ZipCode :: <input type="text" id="zipcode"></input>
+	New ZipCode :: <input type="text" id="newZipcode"></input>
+	<br/>
+	City :: <input type="text" id="city"></input>
+</div>	
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script>
+  $("#zipcode").autocomplete({
+        source : function (request, response) {
+            $.ajax({
+                url : "/zipLookup",
+                dataType : "json", 
+                data: {
+                    data: request.term
+                  },
+                type : "POST", 
+                timeout : 30000, 
+                processData : true, 
+                cache : false, 
+                success: function(data){
+                    var result = $.map(data, function(item){
+                        return {
+                            label: item.zipcode + ":"+item.city+":"+item.state,
+                            value: item.zipcode
+                        }
+                    });
+                response(result);
+                }
+            });
+         },
+        select : function (event, ui) {
+        	var LabelVar= ui.item.label.split(':')
+        	$('#newZipcode').val(LabelVar[0]);
+            $('#zipcode').val(LabelVar[0]);
+            $('#city').val(LabelVar[1] +", " + LabelVar[2]);               
+        },
+       /*  response: function (e, ui) {
+        	  ui.content.push(
+        	    {label:"Other", value:"Option"}
+        	  );
+        	}
+         */
+    });
+ 
+</script>
+</body>
+</html>
